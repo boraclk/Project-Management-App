@@ -1,16 +1,19 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, ImageBackground} from "react-native";
 import {Actions} from 'react-native-router-flux';
-import {Input, Button, ListItem, Divider} from 'react-native-elements';
+import {Input, Button, ListItem, Divider, Overlay} from 'react-native-elements';
 import {colors, fonts} from "res/index";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {inject, observer} from "mobx-react";
-import SelectMultiple from '@quanterdynamic/react-native-multiple-select'
+import SelectMultiple from '@quanterdynamic/react-native-multiple-select';
+import moment from 'moment';
+import {TextInputMask} from 'react-native-masked-text';
+
 const renderLabel = (item) => {
     return (
-        <View style={{marginLeft: 15,borderRadius:25}}>
-            <Text style={[{marginLeft: 0,fontFamily:fonts.avenirMedium,fontSize:17}]}>{item.name}</Text>
-            <Text style={[{marginLeft: 0,fontFamily:fonts.avenirMedium,color:colors.black50}]}>{item.mastery}</Text>
+        <View style={{marginLeft: 15, borderRadius: 25}}>
+            <Text style={[{marginLeft: 0, fontFamily: fonts.avenirMedium, fontSize: 17}]}>{item.name}</Text>
+            <Text style={[{marginLeft: 0, fontFamily: fonts.avenirMedium, color: colors.black50}]}>{item.mastery}</Text>
         </View>
     )
 };
@@ -23,12 +26,17 @@ class AddProject extends Component {
         this.state = {
             people: [],
             selectedPeople: [],
+            isVisible: false,
+            emptyField: false,
+            invalidDate: false,
         };
     }
+
     state = {
         projectName: '',
-        dueDate: '',
+        dueDate: moment("", 'MM/DD/YYYY'),
     };
+
     componentDidMount() {
         const {authStore} = this.props;
         this.setState({
@@ -43,19 +51,45 @@ class AddProject extends Component {
     saveProject = async () => {
         const {authStore} = this.props;
         const {selectedPeople, projectName, dueDate} = this.state;
-        if(projectName && dueDate) {
-            authStore.setProjectDatabase(projectName, dueDate,selectedPeople);
-            await authStore.loadProjectDatabase();
-            Actions.manage();
+        if (projectName && dueDate && (selectedPeople.length > 0)){
+            if (moment(dueDate).isValid() && (moment(dueDate).diff() > 0)) {
+               await authStore.setProjectDatabase(projectName, dueDate, selectedPeople);
+                await authStore.loadProjectDatabase();
+                Actions.manage();
+            } else {
+                this.setState({isVisible: true, invalidDate: true})
+            }
+        } else {
+            this.setState({isVisible: true, emptyField: true})
         }
     };
     keyExtractor = (items, index) => index.toString();
+
     render() {
         const {authStore} = this.props;
-
+        let message;
+        if (this.state.emptyField) {
+            message = 'Please fill in the required fields !'
+        } else if (this.state.invalidDate) {
+            message = 'Please enter a valid date !'
+        }
         return (
             <View style={styles.container}>
                 <StatusBar hidden={true}/>
+                <Overlay
+                    isVisible={this.state.isVisible}
+                    windowBackgroundColor="rgba(0, 0, 0, .5)"
+                    overlayBackgroundColor={colors.secondary}
+                    onBackdropPress={() => this.setState({
+                        isVisible: false, emptyField: false, invalidDate: false})}
+                    width="auto"
+                    height="auto"
+                    overlayStyle={styles.overlayContainer}
+                >
+                    <Text style={{color: colors.white}}>
+                        {message}
+                    </Text>
+                </Overlay>
                 <View style={styles.topButtons}>
                     <TouchableOpacity
                         style={styles.backButton}
@@ -92,24 +126,29 @@ class AddProject extends Component {
                             />
                         }
                     />
-                    <Input
-                        placeholder={'Due Date'}
-                        inputStyle={styles.inputTextStyle}
-                        containerStyle={styles.inputContainer}
-                        onChangeText={(dueDate) => this.setState({dueDate: dueDate})}
-                        leftIcon={
-                            <Icon
-                                name="calendar-o"
-                                size={30}
-                                color={colors.black50}
-                            />
-                        }
-                    />
+                    <View style={styles.dateContainer}>
+                        <Icon
+                            name="calendar-o"
+                            size={30}
+                            color={colors.black50}
+                            style={{marginTop: 5}}
+                        />
+                        <TextInputMask
+                            type={'datetime'}
+                            options={{
+                                format: 'MM/DD/YYYY',
+                            }}
+                            style={styles.dateTextStyle}
+                            value={this.state.dueDate}
+                            onChangeText={dueDate => this.setState({dueDate: dueDate})}
+                            placeholder={'Due Date  (MM/DD/YYYY)'}
+                        />
+                    </View>
+                    <Divider style={styles.dividerStyle}/>
                 </View>
                 <View style={styles.workerCountDirection}>
                     <Text style={styles.workerCount}>Assign Workers ({authStore.user.workers.length})</Text>
                 </View>
-
                 <SelectMultiple
                     keyExtractor={this.keyExtractor}
                     rowStyle={styles.listContainer}
@@ -127,6 +166,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.background,
+    },
+    overlayContainer: {
+        borderRadius: 20,
+        borderWidth: 4,
+        borderColor: colors.primary,
     },
     backButton: {
         alignItems: 'center',
@@ -160,16 +204,31 @@ const styles = StyleSheet.create({
     inputContainer: {
         marginVertical: 5,
     },
+    dateContainer: {
+        marginLeft: 25,
+        flexDirection: 'row',
+    },
+    dateTextStyle: {
+        fontSize: 20,
+        marginLeft: 10,
+        width: 250,
+        fontFamily: fonts.avenirMedium,
+        letterSpacing: 0.06,
+    },
     inputTextStyle: {
         marginTop: 5,
         marginLeft: 10,
-        width: 100,
         fontSize: 20,
         fontFamily: fonts.avenirMedium,
         letterSpacing: 0.06,
     },
     inputsDirection: {
         marginTop: 30,
+    },
+    dividerStyle: {
+        marginHorizontal: 10,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        height: 1,
     },
     topButtons: {
         justifyContent: 'space-between',

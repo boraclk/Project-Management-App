@@ -5,7 +5,6 @@ import {Divider, ListItem} from "react-native-elements";
 import {Actions} from 'react-native-router-flux';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/Foundation';
-import firebase from 'react-native-firebase'
 import {inject, observer} from "mobx-react";
 
 

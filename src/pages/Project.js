@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {Divider, ListItem} from "react-native-elements";
 import {inject, observer} from "mobx-react";
 
+
 @inject('authStore')
 @observer
 class Project extends Component {
