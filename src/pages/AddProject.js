@@ -4,6 +4,7 @@ import {Actions} from 'react-native-router-flux';
 import {Input, Button, ListItem, Divider, Overlay} from 'react-native-elements';
 import {colors, fonts} from "res/index";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import WarnIcon from 'react-native-vector-icons/Entypo';
 import {inject, observer} from "mobx-react";
 import SelectMultiple from '@quanterdynamic/react-native-multiple-select';
 import moment from 'moment';
@@ -79,14 +80,20 @@ class AddProject extends Component {
                 <Overlay
                     isVisible={this.state.isVisible}
                     windowBackgroundColor="rgba(0, 0, 0, .5)"
-                    overlayBackgroundColor={colors.secondary}
+                    overlayBackgroundColor={'rgba(0, 0, 0, 0.3)'}
                     onBackdropPress={() => this.setState({
                         isVisible: false, emptyField: false, invalidDate: false})}
                     width="auto"
                     height="auto"
                     overlayStyle={styles.overlayContainer}
                 >
-                    <Text style={{color: colors.white}}>
+                    <WarnIcon
+                        name={'warning'}
+                        size={35}
+                        color={colors.primary}
+                        style={{marginTop:10}}
+                    />
+                    <Text style={styles.overlayText}>
                         {message}
                     </Text>
                 </Overlay>
@@ -168,9 +175,17 @@ const styles = StyleSheet.create({
         backgroundColor: colors.background,
     },
     overlayContainer: {
+        alignItems:'center',
         borderRadius: 20,
-        borderWidth: 4,
-        borderColor: colors.primary,
+
+        borderColor: colors.black,
+    },
+    overlayText: {
+        color: colors.white,
+        fontFamily: fonts.avenirMedium,
+        fontSize: 15,
+        marginVertical:10,
+        marginHorizontal:10,
     },
     backButton: {
         alignItems: 'center',
