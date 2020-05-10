@@ -8,8 +8,6 @@ import {Divider, ListItem, Overlay} from "react-native-elements";
 import {inject, observer} from "mobx-react";
 
 
-
-
 @inject('authStore')
 @observer
 class Project extends Component {
@@ -22,39 +20,14 @@ class Project extends Component {
     }
 
     render() {
-        const {workers, projectName, dueDate} = this.props;
+        const {workers, projectName, dueDate, authStore, tasks} = this.props;
 
         return (
             <View style={{flex: 1}}>
                 <StatusBar hidden={true}/>
-                <Overlay
-                    isVisible={this.state.isVisible}
-                    windowBackgroundColor="rgba(0, 0, 0, .5)"
-                    overlayBackgroundColor={'rgba(0, 0, 0, 0.3)'}
-                    onBackdropPress={() => this.setState({
-                        isVisible: false
-                    })}
-                    width="auto"
-                    height="auto"
-                    overlayStyle={styles.overlayContainer}
-                >
-                    <ScrollView>
-                        {
-                            workers.map((l, i) => (
-                                    <ListItem
-                                        key={i}
-                                        title={l.name}
-                                        subtitle={l.mastery}
-                                        bottomDivider
-                                    />
-                                )
-                            )
-                        }
-                    </ScrollView>
-                </Overlay>
                 <TouchableOpacity
                     style={styles.backButton}
-                    onPress={Actions.pop}
+                    onPress={()=>Actions.manage()}
                 >
                     <BackIcon name={'reply-all'}
                               size={25}
@@ -69,13 +42,28 @@ class Project extends Component {
                         Until {dueDate}
                     </Text>
                 </View>
-                <TouchableOpacity onPress={() => this.setState({isVisible: true})}>
+                <Text></Text>
+                <TouchableOpacity onPress={() => Actions.addTask(
+                    {workers: workers, dueDate: dueDate, projectName: projectName,tasks:tasks})}>
                     <AddIcon name={'circle-with-plus'}
                              size={40}
                              color={colors.black50}
                     />
                 </TouchableOpacity>
                 <ScrollView>
+                    {
+                        authStore.tasks.map((l, i) => (
+                                <ListItem
+                                    key={i}
+                                    title={l.taskDescription}
+                                    subtitle={l.worker}
+                                    bottomDivider
+                                    containerStyle={styles.listContainer}
+                                    titleStyle={{fontFamily: fonts.avenirMedium, color: colors.black}}
+                                />
+                            )
+                        )
+                    }
                 </ScrollView>
 
             </View>
@@ -96,10 +84,15 @@ const styles = StyleSheet.create({
         borderColor: colors.black,
     },
     listContainer: {
-        marginHorizontal: 10,
-        marginVertical: 4,
-        backgroundColor: colors.white,
-        borderRadius: 15,
+        marginVertical: 6,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowRadius: 10,
+        shadowOpacity: 1,
+        elevation: 4,
     },
     textDirection: {
         alignItems: 'center',

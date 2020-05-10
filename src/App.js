@@ -11,6 +11,7 @@ import {
     AddWorkerScreen,
     RegisterScreen,
     ProfileSettings,
+    AddTaskScreen,
 } from '~/pages';
 import {colors} from 'res';
 import {AlertLightBox} from '~/components/modals';
@@ -42,6 +43,7 @@ export default class App extends React.Component {
                             <Scene key={'manage'} component={ManageScreen} iconName={'group'} hideNavBar/>
                             <Scene key={'profile'} component={ProfileSettings} hideNavBar/>
                             <Scene key={'addProject'} component={AddProjectScreen} hideNavBar/>
+                            <Scene key={'addTask'} component={AddTaskScreen} hideNavBar/>
                             <Tabs icon={TabIcon} showLabel={false} hideNavBar={false}>
                                 <Scene key={'manage'} component={ManageScreen} iconName={'group'} hideNavBar/>
                             </Tabs>

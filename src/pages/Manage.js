@@ -17,9 +17,18 @@ class Manage extends Component {
         await authStore.loadOtherUsers();
         Actions.addWorker();
     };
-
+    gotoProject = (projectName,dueDate,projectWorkers,tasks) => {
+        const {authStore} = this.props;
+        authStore.resetTasks();
+        authStore.setTasks(tasks);
+        Actions.project({
+            projectName: projectName,
+            dueDate: dueDate,
+            workers: projectWorkers,});
+    };
     render() {
         const {authStore} = this.props;
+
         return (
             <View style={styles.backgroundImage}>
                 <StatusBar hidden={true}/>
@@ -72,11 +81,8 @@ class Manage extends Component {
                     {
                         authStore.projects.map((l, i) => (
                                 <TouchableOpacity key={i}
-                                                  onPress={() => Actions.project({
-                                                      projectName: l.projectName,
-                                                      dueDate: l.dueDate,
-                                                      workers: l.projectWorkers,
-                                                  })}>
+                                                  onPress={() =>this.gotoProject(
+                                                      l.projectName,l.dueDate,l.projectWorkers,l.tasks)}>
                                     <ListItem
                                         key={i}
                                         title={l.projectName}

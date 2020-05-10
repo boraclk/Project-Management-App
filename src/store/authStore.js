@@ -28,6 +28,7 @@ class AuthStore {
         this.mastery = null;
         this.projects = [];
         this.loginModal = false;
+        this.tasks = null;
     }
 
     @action
@@ -61,7 +62,6 @@ class AuthStore {
     @action
     addWorker = worker => {
         const ref = firebase.firestore().collection('users');
-
         worker.map((l, i) => (
             ref.doc(this.user.uid).update({
                 workers: firebase.firestore.FieldValue.arrayUnion(ref.doc(l.uid)),
@@ -81,6 +81,15 @@ class AuthStore {
         });
     }
 
+
+    @action
+    setTasks = (task) => {
+        this.tasks=task;
+    };
+    @action
+    resetTasks = () => {
+        this.tasks=[];
+    };
     @action
     handleSignUp = () => {
         firebase
@@ -95,6 +104,7 @@ class AuthStore {
         projectRef.doc(name).set({
             projectName: name,
             dueDate: date,
+            tasks: [],
         });
         const userRef = firebase.firestore().collection('users');
         projectWorkers.map((l, i) => (
@@ -103,6 +113,20 @@ class AuthStore {
             })
         ));
     };
+    @action
+    setTaskDatabase = async (projectName, taskName, worker) => {
+        const taskRef = firebase.firestore().collection('tasks');
+        const userRef = firebase.firestore().collection('users');
+        const projectRef = firebase.firestore().collection('projects');
+        taskRef.doc(taskName).set({
+            taskDescription: taskName,
+            worker: worker.name,
+        });
+        await projectRef.doc(projectName).update({
+            tasks: firebase.firestore.FieldValue.arrayUnion(taskRef.doc(taskName)),
+        });
+    };
+
     @action
     loadProjectDatabase = async () => {
         this.projects = [];
@@ -116,9 +140,12 @@ class AuthStore {
             const projectWorkers = await Promise.all(data.projectWorkers.map(async projectWorkers => {
                 return (await projectWorkers.get()).data();
             }));
-
-            this.projects.push({...data, projectWorkers});
+            const tasks = await Promise.all(data.tasks.map(async tasks => {
+                return (await tasks.get()).data();
+            }));
+            this.projects.push({...data, projectWorkers, tasks});
         }
+
 
     };
     @action

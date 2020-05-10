@@ -7,4 +7,5 @@ import AddWorkerScreen from "./AddWorker";
 import RegisterScreen from "./Register";
 import ProfileSettings from './ProfileSettings';
 import ProjectScreen from './Project';
-export { HomeScreen, StoreTestScreen, LoginScreen, ManageScreen,AddProjectScreen,AddWorkerScreen,RegisterScreen,ProfileSettings,ProjectScreen };
+import AddTaskScreen from "./AddTask";
+export { HomeScreen, StoreTestScreen, LoginScreen, ManageScreen,AddProjectScreen,AddWorkerScreen,RegisterScreen,ProfileSettings,ProjectScreen,AddTaskScreen };
