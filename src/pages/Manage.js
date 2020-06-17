@@ -17,15 +17,17 @@ class Manage extends Component {
         await authStore.loadOtherUsers();
         Actions.addWorker();
     };
-    gotoProject = (projectName,dueDate,projectWorkers,tasks) => {
+    gotoProject = (projectName, dueDate, projectWorkers, tasks) => {
         const {authStore} = this.props;
         authStore.resetTasks();
         authStore.setTasks(tasks);
         Actions.project({
             projectName: projectName,
             dueDate: dueDate,
-            workers: projectWorkers,});
+            workers: projectWorkers,
+        });
     };
+
     render() {
         const {authStore} = this.props;
 
@@ -41,7 +43,7 @@ class Manage extends Component {
                         color={colors.black50}
                     />
                 </TouchableOpacity>
-                <View style={{flex: 1, alignItems: 'center', marginTop: 30,marginBottom:30}}>
+                <View style={{flex: 1, alignItems: 'center', marginTop: 30, marginBottom: 30}}>
                     <Text style={{fontWeight: 'bold', fontSize: 20}}>Manager</Text>
                     <Text style={{fontWeight: 'bold', fontStyle: 'italic', fontSize: 20}}>
                         " {authStore.user.name} "
@@ -81,8 +83,8 @@ class Manage extends Component {
                     {
                         authStore.projects.map((l, i) => (
                                 <TouchableOpacity key={i}
-                                                  onPress={() =>this.gotoProject(
-                                                      l.projectName,l.dueDate,l.projectWorkers,l.tasks)}>
+                                                  onPress={() => this.gotoProject(
+                                                      l.projectName, l.dueDate, l.projectWorkers, l.tasks)}>
                                     <ListItem
                                         key={i}
                                         title={l.projectName}
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
-        borderColor:colors.black50,
+        borderColor: colors.black50,
         borderWidth: 2,
         borderRadius: 10,
         height: 100,
